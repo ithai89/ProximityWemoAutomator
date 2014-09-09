@@ -15,7 +15,7 @@ data = '''
 <s:Envelope xmlns:s="http://schemas.xmlsoap.org/soap/envelope/" s:encodingStyle="http://schemas.xmlsoap.org/soap/encoding/">
 	<s:Body>
 		<u:SetBinaryState xmlns:u="urn:Belkin:service:basicevent:1">
-			<BinaryState>1</BinaryState>
+			<BinaryState>0</BinaryState>
 		</u:SetBinaryState>
 	</s:Body>
 </s:Envelope>'''
