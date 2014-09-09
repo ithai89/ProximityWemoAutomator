@@ -8,8 +8,8 @@ class upnp():
 	mreq = None
 	port = None
 	msearchHeaders = {
-		'MAN' : '"ssdp:discover"',
-		'MX'  : '1'
+		'Man' : '"ssdp:discover"',
+		'MX'  : '3'
 	}
 	DEFAULT_IP = "239.255.255.250"
 	DEFAULT_PORT = 1900
@@ -96,19 +96,30 @@ class upnp():
 	#Listen for network data
 	def listen(self,size,socket):
 		if socket == False:
+			print 'socket == false'
 			socket = self.ssock
 		try:
-			return socket.recv(size)
+			a = socket.recv(size)
+			print 'a', a
+			return a
+
 		except:
+			print 'exception'
 			return False
 
 	#Send network data
 	def send(self,data,socket):
+
+		print 'send', data, socket
 		#By default, use the client socket that's part of this class
 		if socket == False:
 			socket = self.csock
+			print self.socket
 		try:
-			socket.sendto(data,(self.ip,self.port))
+			print 'sendto', data
+			print 'ip: ' + self.ip, self.port
+			print socket.sendto(data,(self.ip,self.port))
+
 			return True
 		except Exception, e:
 			print "SendTo method failed for %s:%d : %s" % (self.ip,self.port,e)
@@ -136,12 +147,18 @@ class upnp():
 	def buildMsearchRequest(self, searchType, searchName):
 		st = "urn:%s:%s:%s:%s" % (self.DEFAULT_domainName,searchType,searchName,self.UPNP_VERSION.split('.')[0])
 		
+		# request = 	"M-SEARCH * HTTP/1.1\r\n"\
+		# 		"HOST:%s:%d\r\n"\
+		# 		"ST:%s\r\n" % (self.ip,self.port,st)
 		request = 	"M-SEARCH * HTTP/1.1\r\n"\
-				"HOST:%s:%d\r\n"\
-				"ST:%s\r\n" % (self.ip,self.port,st)
+				"Host:%s:%d\r\n"\
+				"USER-AGENT: MBP\r\n"\
+				"ST:upnp:rootdevice\r\n" % (self.ip, self.port)
 		for header,value in self.msearchHeaders.iteritems():
 				request += header + ':' + value + "\r\n"	
 		request += "\r\n" 
+
+		print 'REQUEST', request
 		
 		return request
 
@@ -185,18 +202,31 @@ class upnp():
 	#Actively search for UPNP devices
 	def msearch(self,searchType,searchName):	
 		print "Entering active search"	
-		myip = '' #should be localhost
+		myip = '192.168.1.204' #should be localhost
 			
 		#Have to create a new socket since replies will be sent directly to our IP, not the multicast IP
+		
+		print myip, self.port
 		server = self.createNewListener(myip,self.port)
 		if server == False:
 			print 'Failed to bind port %d' % self.port
 			return
 
+
 		self.send(self.buildMsearchRequest(searchType, searchName),server)
 		
-		while True:			
-			if self.findRequest(self.listen(1024,server), searchType, searchName): return true
+		count = 0
+		data = ""
+		while True:
+
+			print count
+			count += 1		
+			# self.listen(1024, server)
+			data = data + server.recv(1024)
+			if data.endswith(u"\r\n"):
+				print "data", data
+				data = ""
+			# self.findRequest(self.listen(1024,server), searchType, searchName)
 
 
 
@@ -213,6 +243,11 @@ class upnp():
 		if server == False:
 			print 'Failed to bind port %d' % self.port
 			return
-
-		while True:			
+		count = 0
+		while True:
 			if self.findRequest(self.listen(1024, server), searchType, searchName): return true	
+
+
+if __name__ == '__main__':
+	u = upnp(None, None, None)
+	u.msearch(None, None)
