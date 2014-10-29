@@ -1,0 +1,3 @@
+[submodule "wemokit"]
+	path = wemokit
+	url = git@ivanthai.com:wemo.git
