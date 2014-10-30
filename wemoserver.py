@@ -42,4 +42,4 @@ if __name__ == '__main__':
     client = Wemo()
     print client
     client.scan()
-    app.run(debug=True)
+    app.run(debug=True, port=8080, host='0.0.0.0')
