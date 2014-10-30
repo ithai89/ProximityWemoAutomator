@@ -26,6 +26,18 @@ def toggle(device_id):
     return jsonify(status=dict(device_id=device_id,
                                status=str(client.toggle(device_id))))
 
+
+@app.route("/device/<int:device_id>/on")
+def on(device_id):
+    return jsonify(status=dict(device_id=device_id,
+                               status=str(client.on(device_id))))
+
+
+@app.route("/device/<int:device_id>/off")
+def off(device_id):
+    return jsonify(status=dict(device_id=device_id,
+                               status=str(client.off(device_id))))
+
 if __name__ == '__main__':
     client = Wemo()
     print client
