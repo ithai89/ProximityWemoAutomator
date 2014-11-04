@@ -21,6 +21,22 @@ def scan():
     return
 
 
+@app.route("/devices/on")
+def onAll():
+    return jsonify(devices=str(client.onAll()))
+
+
+@app.route("/devices/off")
+def offAll():
+    return jsonify(devices=str(client.offAll()))
+
+
+@app.route("/devices/toggle")
+def toggleAll():
+    client.toggleAll()
+    return jsonify(devices=str(client.toggleAll()))
+
+
 @app.route("/device/<int:device_id>/toggle")
 def toggle(device_id):
     return jsonify(status=dict(device_id=device_id,
