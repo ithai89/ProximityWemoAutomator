@@ -1,5 +1,6 @@
 from flask import Flask, jsonify
 from wemokit.wemo import Wemo
+from json import dumps
 
 app = Flask(__name__)
 client = None
@@ -45,14 +46,12 @@ def toggle(device_id):
 
 @app.route("/device/<int:device_id>/on")
 def on(device_id):
-    return jsonify(status=dict(device_id=device_id,
-                               status=str(client.on(device_id))))
+    return dumps(client.on(device_id).serialize())
 
 
 @app.route("/device/<int:device_id>/off")
 def off(device_id):
-    return jsonify(status=dict(device_id=device_id,
-                               status=str(client.off(device_id))))
+    return dumps(client.off(device_id).serialize())
 
 if __name__ == '__main__':
     client = Wemo()
