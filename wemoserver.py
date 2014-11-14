@@ -1,6 +1,8 @@
 from flask import Flask, jsonify
 from wemokit.wemo import Wemo
 from json import dumps
+from threading import Thread
+from time import sleep
 
 app = Flask(__name__)
 client = None
@@ -18,8 +20,13 @@ def _devices():
 
 @app.route("/scan")
 def scan():
-    client.scan()
-    return
+    thread = Thread(target=client.scan)
+    thread.start()
+    thread.join()
+    sleep(10)
+    thread.exit()
+    #client.scan()
+    return 'working'
 
 
 @app.route("/devices/on")
@@ -32,6 +39,11 @@ def offAll():
     return jsonify(devices=str(client.offAll()))
 
 
+@app.route("/device/<int:device_id>")
+def get(device_id):
+    return jsonify(devices=client.get(device_id).serialize())
+
+
 @app.route("/devices/toggle")
 def toggleAll():
     client.toggleAll()
@@ -40,8 +52,7 @@ def toggleAll():
 
 @app.route("/device/<int:device_id>/toggle")
 def toggle(device_id):
-    return jsonify(status=dict(device_id=device_id,
-                               status=str(client.toggle(device_id))))
+    return dumps(client.toggle(device_id).serialize())
 
 
 @app.route("/device/<int:device_id>/on")
